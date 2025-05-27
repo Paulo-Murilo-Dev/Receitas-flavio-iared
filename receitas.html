@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livro de Receitas</title>
+  <link rel="icon" href="./imgs/logo.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --rosa-claro: #fff0f5;
+      --rosa-medio: #ffb6c1;
+      --rosa-escuro: #db7093;
+      --rosa-destaque: #ff69b4;
+      --texto-escuro: #4a2c40;
+      --sombra: rgba(219, 112, 147, 0.3);
+    }
+
+    body {
+      background-color: var(--rosa-claro);
+      color: var(--texto-escuro);
+      font-family: 'Patrick Hand', cursive;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Splash Screen */
+    .splash {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      background: var(--rosa-claro);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeOut 0.5s 2s forwards;
+    }
+
+    .splash h1 {
+      font-family: 'Dancing Script', cursive;
+      font-weight: 700;
+      color: var(--rosa-escuro);
+      font-size: 3rem;
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeInScale 0.6s 0.3s forwards;
+      position: relative;
+    }
+
+    .splash h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--rosa-destaque);
+      transform: translateX(-50%);
+      animation: underlineGrow 0.8s 0.6s forwards;
+    }
+
+    .splash-tech {
+      font-family: 'Patrick Hand', cursive;
+      color: var(--rosa-escuro);
+      font-size: 1.2rem;
+      opacity: 0;
+      margin-top: 1rem;
+      animation: fadeIn 0.6s 1s forwards;
+    }
+
+    .splash-logo {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeInScale 0.6s 0.1s forwards;
+      margin-bottom: 1rem;
+      filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.1));
+    }
+
+    @keyframes fadeInScale {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes underlineGrow {
+      to {
+        width: 60%;
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      padding: 3rem;
+      box-shadow: 0 6px 20px var(--sombra);
+      transform: translateY(30px);
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      position: relative;
+      border: 2px solid var(--rosa-medio);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #fff, var(--rosa-claro));
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, var(--rosa-medio), var(--rosa-destaque));
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-content h3 {
+      font-family: 'Dancing Script', cursive;
+      color: var(--rosa-destaque);
+      font-size: 2.2rem;
+      margin-bottom: 1.8rem;
+      border-bottom: 2px dashed var(--rosa-medio);
+      padding-bottom: 0.7rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .modal-content p {
+      margin-bottom: 1rem;
+      line-height: 1.7;
+      font-size: 1.2rem;
+    }
+
+    .modal-content ul {
+      list-style-type: disc;
+      margin-left: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-content li {
+      margin-bottom: 0.5rem;
+      color: var(--texto-escuro);
+      font-size: 1.2rem;
+    }
+
+    .modal-content p strong,
+    .modal-content li strong {
+      color: var(--rosa-escuro);
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1px solid var(--rosa-medio);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 36px;
+      height: 36px;
+      background: var(--rosa-escuro);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 1.3rem;
+      font-weight: bold;
+      z-index: 10;
+      transition: all 0.3s ease;
+      border: 2px solid white;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .modal-close:hover {
+      background: var(--rosa-destaque);
+      transform: scale(1.15) rotate(90deg);
+    }
+
+    .modal-section {
+      margin-bottom: 2rem;
+    }
+
+    .modal-section-title {
+      font-weight: bold;
+      color: var(--rosa-escuro);
+      margin-bottom: 0.7rem;
+      display: block;
+      font-size: 1.4rem;
+    }
+
+    /* Header */
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(to right, var(--rosa-medio), var(--rosa-destaque));
+      color: white;
+      font-size: 2.5rem;
+      font-family: 'Dancing Script', cursive;
+      box-shadow: 0 4px 12px var(--sombra);
+      position: relative;
+      animation: headerGlow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes headerGlow {
+      from {
+        box-shadow: 0 4px 12px var(--sombra);
+      }
+      to {
+        box-shadow: 0 6px 18px rgba(219, 112, 147, 0.4);
+      }
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, 
+        rgba(255,255,255,0.9), 
+        var(--rosa-destaque), 
+        var(--rosa-escuro), 
+        rgba(255,255,255,0.9));
+    }
+
+    .search {
+      margin: 2rem auto;
+      text-align: center;
+      max-width: 800px;
+      padding: 0 1rem;
+    }
+
+    .search input {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+      width: 100%;
+      border: 2px solid var(--rosa-medio);
+      border-radius: 50px;
+      outline: none;
+      font-family: 'Patrick Hand', cursive;
+      box-shadow: 0 2px 8px var(--sombra);
+      transition: all 0.3s ease;
+    }
+
+    .search input:focus {
+      border-color: var(--rosa-destaque);
+      box-shadow: 0 4px 12px var(--sombra);
+    }
+
+    .search input::placeholder {
+      color: var(--rosa-medio);
+      opacity: 0.8;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px var(--sombra);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+      border: 1px solid rgba(255, 182, 193, 0.5);
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 24px var(--sombra);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right, var(--rosa-medio), var(--rosa-destaque));
+    }
+
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 1px solid var(--rosa-medio);
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .card h3 {
+      margin-bottom: 0.8rem;
+      color: var(--rosa-destaque);
+      font-size: 1.8rem;
+      font-family: 'Dancing Script', cursive;
+      border-bottom: 1px dashed var(--rosa-medio);
+      padding-bottom: 0.5rem;
+    }
+
+    .card p {
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .card p strong {
+      color: var(--rosa-escuro);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Responsividade */
+    @media (max-width: 992px) {
+      .modal-content {
+        padding: 2rem;
+      }
+      
+      .modal-content img {
+        height: 280px;
+      }
+      
+      .modal-content p,
+      .modal-content li {
+        font-size: 1.1rem;
+      }
+      
+      .modal-section-title {
+        font-size: 1.3rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 2rem;
+        padding: 1.5rem;
+      }
+      
+      .container {
+        padding: 1rem;
+        grid-template-columns: 1fr;
+      }
+      
+      .card {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      
+      .splash h1 {
+        font-size: 2.2rem;
+      }
+      
+      .splash-logo {
+        width: 140px;
+        height: 140px;
+      }
+      
+      .splash-tech {
+        font-size: 1rem;
+      }
+
+      .modal-content {
+        padding: 1.8rem;
+      }
+
+      .modal-content img {
+        height: 220px;
+      }
+      
+      .modal-content h3 {
+        font-size: 1.8rem;
+      }
+      
+      .modal-close {
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .modal-content {
+        padding: 1.5rem;
+      }
+      
+      .modal-content img {
+        height: 200px;
+      }
+      
+      .modal-content h3 {
+        font-size: 1.6rem;
+      }
+      
+      .modal-content p,
+      .modal-content li {
+        font-size: 1rem;
+      }
+      
+      .modal-section-title {
+        font-size: 1.2rem;
+      }
+      
+      .modal-section {
+        margin-bottom: 1.2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 1.8rem;
+      }
+      
+      .search input {
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+      }
+      
+      .card h3 {
+        font-size: 1.5rem;
+      }
+      
+      .splash h1 {
+        font-size: 1.8rem;
+      }
+      
+      .splash-logo {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .splash-tech {
+        font-size: 0.9rem;
+      }
+
+      .modal-content {
+        padding: 1.2rem;
+      }
+
+      .modal-content img {
+        height: 180px;
+      }
+      
+      .modal-content h3 {
+        font-size: 1.5rem;
+      }
+      
+      .modal-close {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div class="splash">
+    <img src="./imgs/logo.png" alt="Livro de Receitas" class="splash-logo">
+    <h1>Livro de Receitas</h1>
+    <div class="splash-tech">Tecnologia - 2025</div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="main-content">
+    <header>Livro de Receitas</header>
+
+    <div class="search">
+      <input type="text" id="searchBox" placeholder="Buscar por receita, aluno ou responsável..." />
+    </div>
+
+    <div class="container" id="cards">
+     <!-- Receita 1 - Bolinho de chuva -->
+<div class="card" data-modal="modal1" data-title="Bolinho de chuva" data-aluno="Lívia Pacetti de Melo" data-responsavel="Maiara Pacetti">
+    <img src="./imgs/chuva.jpg" alt="Bolinho de chuva">
+  <div class="card-content">
+    <h3>Bolinho de chuva</h3>
+    <p><strong>Aluno:</strong> Lívia Pacetti de Melo</p>
+    <p><strong>Responsável:</strong> Maiara Pacetti</p>
+    <p><strong>Lembrança:</strong> Não</p>
+  </div>
+</div>
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/chuva.jpg" alt="Bolinho de chuva">
+    <h3>Bolinho de chuva</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Lívia Pacetti de Melo</p>
+      <p><strong>Responsável:</strong> Maiara Pacetti</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>2 ovos</li>
+        <li>1 Xícara (chá) de leite</li>
+        <li>1 colher (sopa) de fermento</li>
+        <li>1 colher (sopa) de canela para polvilhar</li>
+        <li>1 Xícara de açúcar</li>
+        <li>2 e 1/2 xícaras de farinha de trigo</li>
+        <li>3 colheres (sopa) de açúcar para polvilhar</li>
+        <li>1 litro de óleo para fritar</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Misture todos os ingredientes até obter uma massa cremosa</li>
+        <li>Em uma panela aqueça bastante o óleo para que os bolinhos possam boiar</li>
+        <li>Quando o óleo estiver bem quente, com um colher, comece a colocar pequenas quantidades de massa e frite até que dourem por inteiro</li>
+        <li>Coloque os bolinhos sobre um papel absorvente e passe-os no açúcar com canela</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Não</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 2 - Macarrão de pizza -->
+<div class="card" data-modal="modal2" data-title="Macarrão de pizza" data-aluno="Valentina menossi turcato" data-responsavel="Renato Mateus Turcato">
+    <img src="./imgs/Macarrao-Pizza.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Macarrão de pizza</h3>
+    <p><strong>Aluno:</strong> Valentina menossi turcato</p>
+    <p><strong>Responsável:</strong> Renato Mateus Turcato</p>
+    <p><strong>Lembrança:</strong> Sempre que meu primo de Goiânia vinha visitar a gente minha mãe fazia pra nós era incrível</p>
+  </div>
+</div>
+<div id="modal2" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/Macarrao-Pizza.jpg" alt="receita">
+    <h3>Macarrão de pizza</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Valentina menossi turcato</p>
+      <p><strong>Responsável:</strong> Renato Mateus Turcato</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1 pacote macarrão parafuso</li>
+        <li>Presunto</li>
+        <li>Mussarela</li>
+        <li>Orégano</li>
+        <li>Tomate</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Cozinhe o macarrão</li>
+        <li>Coloque em uma travessa adicione cubos de mussarela, presunto e tomate</li>
+        <li>Coloque um pouco de orégano</li>
+        <li>Cubra com papel alumínio e leve ao forno</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Sempre que meu primo de Goiânia vinha visitar a gente minha mãe fazia pra nós era incrível</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 3 - Rosca húngara -->
+<div class="card" data-modal="modal3" data-title="Rosca húngara" data-aluno="Miguel de mello cruz ricardino" data-responsavel="Aline tatiane de mello cruz ricardino">
+    <img src="./imgs/roscah.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Rosca húngara</h3>
+    <p><strong>Aluno:</strong> Miguel de mello cruz ricardino</p>
+    <p><strong>Responsável:</strong> Aline tatiane de mello cruz ricardino</p>
+    <p><strong>Lembrança:</strong> Lembrança de vó</p>
+  </div>
+</div>
+<div id="modal3" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/roscah.jpg" alt="receita">
+    <h3>Rosca húngara</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Miguel de mello cruz ricardino</p>
+      <p><strong>Responsável:</strong> Aline tatiane de mello cruz ricardino</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1kg de farinha</li>
+        <li>50gr de fermento</li>
+        <li>3 ovos</li>
+        <li>1/2 copo de óleo</li>
+        <li>6 colheres de açúcar cristal</li>
+        <li>1 colher rasa de sal</li>
+        <li>1 copo e 1/2 de leite</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Colocar o fermento o açúcar e o sal primeiro e mexer</li>
+        <li>Depois os outros ingredientes e pôr último a farinha de trigo</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Lembrança de vó</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 4 - Doce de abóbora -->
+<div class="card" data-modal="modal4" data-title="Doce de abóbora" data-aluno="Beatriz Sfarcin Veroni" data-responsavel="Vanessa">
+    <img src="./imgs/broba.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Doce de abóbora</h3>
+    <p><strong>Aluno:</strong> Beatriz Sfarcin Veroni</p>
+    <p><strong>Responsável:</strong> Vanessa</p>
+    <p><strong>Lembrança:</strong> Toda vez que ela fazia, tinha que ter pão caseiro também. Meu pai( que já faleceu) adorava 🥺</p>
+  </div>
+</div>
+<div id="modal4" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/broba.jpg" alt="receita">
+    <h3>Doce de abóbora</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Beatriz Sfarcin Veroni</p>
+      <p><strong>Responsável:</strong> Vanessa</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>Abóbora</li>
+        <li>Açúcar</li>
+        <li>Coco ralado</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Cozinhe a abóbora com o açúcar e alguns cravos</li>
+        <li>Depois de pronto acrescente o coco ralado</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Toda vez que ela fazia, tinha que ter pão caseiro também. Meu pai( que já faleceu) adorava 🥺</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 5 - Gelatina cor de rosa -->
+<div class="card" data-modal="modal5" data-title="Gelatina cor de rosa" data-aluno="Beatriz Yuki Canato Inayama" data-responsavel="Cristiane Canato Inayama">
+    <img src="./imgs/gelatinarosa.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Gelatina cor de rosa</h3>
+    <p><strong>Aluno:</strong> Beatriz Yuki Canato Inayama</p>
+    <p><strong>Responsável:</strong> Cristiane Canato Inayama</p>
+    <p><strong>Lembrança:</strong> Sim. Era a receita da minha avó materna (a Bisa da Bia)</p>
+  </div>
+</div>
+<div id="modal5" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/gelatinarosa.jpg" alt="receita">
+    <h3>Gelatina cor de rosa</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Beatriz Yuki Canato Inayama</p>
+      <p><strong>Responsável:</strong> Cristiane Canato Inayama</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1 lata de leite condensado</li>
+        <li>1 litro de leite</li>
+        <li>2 colheres (sopa) de Maizena</li>
+        <li>4 ovos</li>
+        <li>6 colheres (sopa) de açúcar</li>
+        <li>2 caixas de gelatina de morango</li>
+        <li>1/2 litro de água</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Faça o creme batendo no liquidificador o leite condensado, o litro de leite e as gemas (guarde as claras separadas)</li>
+        <li>Dissolva a Maizena e bata junto, bata o suficiente para misturar bem os ingredientes</li>
+        <li>Leve ao fogo e mexa até ferver para não empelotar. Despeje num pirex grande</li>
+        <li>Bata as claras em neve, depois acrescente o açúcar e bata novamente (reserve)</li>
+        <li>Dissolva a gelatina em 250ml de água fervente e 250ml de água fria</li>
+        <li>Misture ainda quente na clara em neve</li>
+        <li>Após misturar bem despeje em cima do creme reservado no pirex</li>
+        <li>Espere esfriar e leve a geladeira até endurecer</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Sim. Era a receita da minha avó materna (a Bisa da Bia)</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 6 - Bolo de fubá -->
+<div class="card" data-modal="modal6" data-title="Bolo de fubá" data-aluno="Miguel Maylon leal de souza" data-responsavel="Sandra Andrea leal de souza">
+    <img src="./imgs/bfuba.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolo de fubá</h3>
+    <p><strong>Aluno:</strong> Miguel Maylon leal de souza</p>
+    <p><strong>Responsável:</strong> Sandra Andrea leal de souza</p>
+    <p><strong>Lembrança:</strong> Sim morávamos na roça há que saudade desse tempo cheirinho de bolo quentinho</p>
+  </div>
+</div>
+<div id="modal6" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bfuba.jpg" alt="receita">
+    <h3>Bolo de fubá</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Miguel Maylon leal de souza</p>
+      <p><strong>Responsável:</strong> Sandra Andrea leal de souza</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>4 ovos</li>
+        <li>2 xícara de chá de açúcar</li>
+        <li>1½ xícara de fubá</li>
+        <li>1 xícara de chá de óleo</li>
+        <li>1½ xícara de chá de farinha de trigo</li>
+        <li>2 xícara de chá de leite de coco</li>
+        <li>1 pitadas de sal</li>
+        <li>1 colher de pó royal</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Bater tudo no liquidificador primeiro os ovos, óleo, leite e o sal bater bem</li>
+        <li>Depois acrescentar a farinha e o pó Royal</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Sim morávamos na roça há que saudade desse tempo cheirinho de bolo quentinho</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 7 - Brigadeiro -->
+<div class="card" data-modal="modal7" data-title="Brigadeiro" data-aluno="Davi Fortini Adorno" data-responsavel="Monique Fortini Adorno">
+    <img src="./imgs/brigadeiro-1-1080x720.jpg.png" alt="receita">
+  <div class="card-content">
+    <h3>Brigadeiro</h3>
+    <p><strong>Aluno:</strong> Davi Fortini Adorno</p>
+    <p><strong>Responsável:</strong> Monique Fortini Adorno</p>
+    <p><strong>Lembrança:</strong> Uma receita prática e infalível. Todos os anos o brigadeiro fazia parte das festas de aniversário.</p>
+  </div>
+</div>
+<div id="modal7" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/brigadeiro-1-1080x720.jpg.png" alt="receita">
+    <h3>Brigadeiro</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Davi Fortini Adorno</p>
+      <p><strong>Responsável:</strong> Monique Fortini Adorno</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1 lata de leite condensado</li>
+        <li>1 colher de sopa de manteiga</li>
+        <li>3 colheres de cacau em pó</li>
+        <li>Granulado (opcional)</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Em uma panela, misture o leite condensado, a manteiga e o cacau em pó</li>
+        <li>Cozinhe em fogo médio, mexendo constantemente, até que a mistura comece a desgrudar da panela</li>
+        <li>Retire do fogo e deixe esfriar um pouco</li>
+        <li>Faça pequenas bolinhas com a mistura e passe no chocolate granulado (se desejar)</li>
+        <li>Sirva e aproveite!</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Uma receita prática e infalível. Todos os anos o brigadeiro fazia parte das festas de aniversário.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 8 - Pé de moça da vovó Fátima -->
+<div class="card" data-modal="modal8" data-title="Pé de moça da vovó Fátima" data-aluno="Levi Pyetro Amâncio de oliveira Osório" data-responsavel="Vovó Fátima">
+    <img src="./imgs/pmoça.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Pé de moça da vovó Fátima</h3>
+    <p><strong>Aluno:</strong> Levi Pyetro Amâncio de oliveira Osório</p>
+    <p><strong>Responsável:</strong> Vovó Fátima</p>
+    <p><strong>Lembrança:</strong> Época de frio vovó junta a família para comer esse doce maravilhoso</p>
+  </div>
+</div>
+<div id="modal8" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/pmoça.jpg" alt="receita">
+    <h3>Pé de moça da vovó Fátima</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Levi Pyetro Amâncio de oliveira Osório</p>
+      <p><strong>Responsável:</strong> Vovó Fátima</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>500 gramas de amendoim</li>
+        <li>1 lata de leite condensado</li>
+        <li>3 xícaras de chá de açúcar cristal</li>
+        <li>200 ml de leite</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Torre o amendoim e tire a pele</li>
+        <li>Triture levemente o amendoim</li>
+        <li>Leve a panela ao fogo coloque 1 xícara de açúcar para caramelizar o amendoim</li>
+        <li>Depois que estiver caramelizado coloque o leite condensado e o leite</li>
+        <li>Coloque as 3 xícaras de açúcar tudo junto na panela</li>
+        <li>Mexa até soltar do fundo da panela</li>
+        <li>Chegou no ponto de soltar do fundo da panela coloque em um refratário de sua preferência</li>
+        <li>Deixe esfriar em temperatura ambiente</li>
+        <li>OBS: se quiser passar os pedaços do doce no açúcar refinado fica a gosto</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Época de frio vovó junta a família para comer esse doce maravilhoso</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 9 - Bolo de queijo -->
+<div class="card" data-modal="modal9" data-title="Bolo de queijo" data-aluno="Maria Clara de Lima Cossulim" data-responsavel="Isabel Cristina de Lima">
+    <img src="./imgs/bqueijo.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolo de queijo</h3>
+    <p><strong>Aluno:</strong> Maria Clara de Lima Cossulim</p>
+    <p><strong>Responsável:</strong> Isabel Cristina de Lima</p>
+    <p><strong>Lembrança:</strong> Cheiro da casa da vó 😋</p>
+  </div>
+</div>
+<div id="modal9" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bqueijo.jpg" alt="receita">
+    <h3>Bolo de queijo</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Maria Clara de Lima Cossulim</p>
+      <p><strong>Responsável:</strong> Isabel Cristina de Lima</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1 copo de óleo</li>
+        <li>1 copo de fubá</li>
+        <li>1 copo de farinha</li>
+        <li>1 copo de queijo ralado</li>
+        <li>Açúcar a gosto</li>
+        <li>1 pitada de sal</li>
+        <li>1 colher de fermento</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Bata todos os ingredientes no liquidificador e por último acrescente o fermento</li>
+        <li>Unte uma forma com margarina e asse por 40 minutos</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Cheiro da casa da vó 😋</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 10 - Bolo Nega Maluca Fofinho -->
+<div class="card" data-modal="modal10" data-title="Bolo Nega Maluca Fofinho" data-aluno="Paolla Vitoria Passoni" data-responsavel="Naiara Passoni">
+    <img src="./imgs/bnegama.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolo Nega Maluca Fofinho</h3>
+    <p><strong>Aluno:</strong> Paolla Vitoria Passoni</p>
+    <p><strong>Responsável:</strong> Naiara Passoni</p>
+    <p><strong>Lembrança:</strong> Ela era feita todo ano em meu aniversario pela minha mãe, que infelizmente hoje ja virou uma estrelinha.</p>
+  </div>
+</div>
+<div id="modal10" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bnegama.jpg" alt="receita">
+    <h3>Bolo Nega Maluca Fofinho</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Paolla Vitoria Passoni</p>
+      <p><strong>Responsável:</strong> Naiara Passoni</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>3 ovos</li>
+        <li>1 xícara (chá) de açúcar</li>
+        <li>1 xícara (chá) de chocolate em pó</li>
+        <li>1/2 xícara (chá) de óleo</li>
+        <li>1 xícara (chá) de água quente</li>
+        <li>2 xícaras (chá) de farinha de trigo</li>
+        <li>1 colher (sopa) de fermento em pó</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Em um liquidificador, bata os ovos, o açúcar, o óleo, o achocolatado e a farinha de trigo</li>
+        <li>Despeje a massa em uma tigela e adicione a água quente e o fermento, misturando bem</li>
+        <li>Despeje a massa em uma forma untada e asse em forno médio-alto (200° C), preaquecido, por 40 minutos</li>
+        <li>Desenforme ainda quente</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Ela era feita todo ano em meu aniversario pela minha mãe, que infelizmente hoje ja virou uma estrelinha.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 12 - Biscoito de polvilho -->
+<div class="card" data-modal="modal12" data-title="Biscoito de polvilho" data-aluno="Lorena Araújo lima Citadini" data-responsavel="Nayara Araújo lima">
+    <img src="./imgs/bpolv.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Biscoito de polvilho</h3>
+    <p><strong>Aluno:</strong> Lorena Araújo lima Citadini</p>
+    <p><strong>Responsável:</strong> Nayara Araújo lima</p>
+    <p><strong>Lembrança:</strong> Dias de chuva ou cafezinho da tarde esperando as crianças chegarem da escola.</p>
+  </div>
+</div>
+<div id="modal12" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bpolv.jpg" alt="receita">
+    <h3>Biscoito de polvilho</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Lorena Araújo lima Citadini</p>
+      <p><strong>Responsável:</strong> Nayara Araújo lima</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>2 xícaras de polvilho azedo ou doce</li>
+        <li>50ml de óleo</li>
+        <li>100 ml de leite</li>
+        <li>2 ovos</li>
+        <li>2 colheres de açúcar</li>
+        <li>Meia xícara de água</li>
+        <li>Sal a gosto</li>
+        <li>Queijo (opcional)</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Em uma caneca misture o leite, o óleo e a água</li>
+        <li>Leve ao fogo até levantar fervura e desligue</li>
+        <li>Em uma vasilha coloque o polvilho, o sal e o açúcar, queijo (opcional)</li>
+        <li>Misture os ingredientes líquidos após a fervura e mexa até fazer gruminhos</li>
+        <li>Espere um pouco até esfriar um pouco</li>
+        <li>Coloque os ovos e mexa bem com as mãos</li>
+        <li>Sove até ficar uma massinha</li>
+        <li>Modele e leve ao fogo com óleo frio</li>
+        <li>Deixe de médio pra baixo, vai olhando (segredo: o açúcar não deixa estourar)</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Dias de chuva ou cafezinho da tarde esperando as crianças chegarem da escola.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 13 - Doce de leite -->
+<div class="card" data-modal="modal13" data-title="Doce de leite" data-aluno="Lorena Barbosa de Oliveira" data-responsavel="Maria Aparecida Barbosa">
+    <img src="./imgs/docedeleite.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Doce de leite</h3>
+    <p><strong>Aluno:</strong> Lorena Barbosa de Oliveira</p>
+    <p><strong>Responsável:</strong> Maria Aparecida Barbosa</p>
+    <p><strong>Lembrança:</strong> Feita pela mãe e ninguém consegue fazer igual</p>
+  </div>
+</div>
+<div id="modal13" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/docedeleite.jpg" alt="receita">
+    <h3>Doce de leite</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Lorena Barbosa de Oliveira</p>
+      <p><strong>Responsável:</strong> Maria Aparecida Barbosa</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1 litro de leite</li>
+        <li>250g de açúcar</li>
+        <li>Margarina para untar</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Ferva o leite e quando levantar fervura, abaixe o fogo e coloque o açúcar</li>
+        <li>Mexa sem parar</li>
+        <li>Vai engrossar depois de cerca de 1 hora, então continue mexendo</li>
+        <li>Você vai ver que fica uma textura de doce de leite de pote mesmo, se quiser parar aí é só guardar</li>
+        <li>Para ter ele em pedaço, pegue um copo com água e com a colher que está mexendo, coloque um pouquinho neste copo, se o doce quebrar em fios não está bom, mexa mais</li>
+        <li>O ponto correto de parar de mexer o doce, é quando colocar ele no copo com água e afundar sem dividir em partes</li>
+        <li>Quando isso acontecer, desligue o fogo</li>
+        <li>Agora use as mãos ou a batedeira, mexa com força e rápido até que o doce perca o "brilho", quando ficar esbranquiçado está bom</li>
+        <li>Unte com margarina a pia ou uma superficie com marmore e coloque o doce</li>
+        <li>Espere esfriar e corte</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Feita pela mãe e ninguém consegue fazer igual</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 14 - Mentira -->
+<div class="card" data-modal="modal14" data-title="Mentira" data-aluno="Matheus henrique fernandes" data-responsavel="Taisa Cristina Gertrudes">
+    <img src="./imgs/mentira.png" alt="receita">
+  <div class="card-content">
+    <h3>Mentira</h3>
+    <p><strong>Aluno:</strong> Matheus henrique fernandes</p>
+    <p><strong>Responsável:</strong> Taisa Cristina Gertrudes</p>
+    <p><strong>Lembrança:</strong> Minha mãe..Maria😢</p>
+  </div>
+</div>
+<div id="modal14" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/mentira.png" alt="receita">
+    <h3>Mentira</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Matheus henrique fernandes</p>
+      <p><strong>Responsável:</strong> Taisa Cristina Gertrudes</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>1/2 xícara de óleo</li>
+        <li>1 colher (sopa) de sal</li>
+        <li>2 colher (sopa) de fermento</li>
+        <li>1 kg de farinha de trigo</li>
+        <li>3 copo americano de leite</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Coloque todos os ingredientes no liquidificador, bata por 3 minutos</li>
+        <li>Em seguida despeja em uma vasilha adicionando aos pouco a farinha de trigo até ficar a massa de pão</li>
+        <li>Depois de pronta abre a massa não muito fina</li>
+        <li>Corte de sua preferência em triângulo, redondo, coração etc.</li>
+        <li>Depois de cortar, coloque meio litro de óleo pra esquentar</li>
+        <li>Quando o óleo tiver bem quente coloque com cuidado pra não se queimar</li>
+        <li>Deixa dorar de um lado e do outro</li>
+        <li>Depois de pronto, bom apetite</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Minha mãe..Maria😢</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 15 - Coxinha de frango da vovó -->
+<div class="card" data-modal="modal15" data-title="Coxinha de frango da vovó" data-aluno="Yuri ravi de Oliveira" data-responsavel="VOVÓ FATIMA">
+    <img src="./imgs/coxinha.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Coxinha de frango da vovó</h3>
+    <p><strong>Aluno:</strong> Yuri ravi de Oliveira</p>
+    <p><strong>Responsável:</strong> VOVÓ FATIMA</p>
+    <p><strong>Lembrança:</strong> Quando a vovó faz e só festa Yuri ama</p>
+  </div>
+</div>
+<div id="modal15" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/coxinha.jpg" alt="receita">
+    <h3>Coxinha de frango da vovó</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Yuri ravi de Oliveira</p>
+      <p><strong>Responsável:</strong> VOVÓ FATIMA</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Massa</span>
+      <ul>
+        <li>500 ml de água</li>
+        <li>1 kilo de farinha de trigo</li>
+        <li>2 tablete de caldo Knorr sabor galinha</li>
+        <li>1 colher de chá raza de manteiga</li>
+        <li>1 colher de chá de Maizena</li>
+        <li>1 pitada de sal</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Recheio</span>
+      <ul>
+        <li>1 KILO DE PEITO DE FRANGO DESFIADO</li>
+        <li>TEMPEROS A GOSTO</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Coloque 500 ml de água para ferver</li>
+        <li>Coloque o caldo Knorr e o sal</li>
+        <li>Depois que levantar fervura coloque aos poucos a farinha de trigo</li>
+        <li>Em seguida coloque a Maizena e a manteiga</li>
+        <li>Mexa a massa até desgrudar do fundo da panela</li>
+        <li>Retire da panela e coloque em um lugar limpos em temperatura ambiente</li>
+        <li>Sove a massa até esfriar e chegar ao ponto de enrolar</li>
+        <li>Faça as bolinhas e coloque o recheio e vá modelando sua coxinhas</li>
+        <li>Depois de montadas todas as coxinhas, empane passando no ovo e na farinha de rosca ou se preferir farinha Panco</li>
+        <li>Feito esse processo frite as coxinhas em oleo quente</li>
+        <li>Depois é só se deliciar com essas gostosuras</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Quando a vovó faz e só festa Yuri ama</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 16 - Bolo de Cenoura Cremoso -->
+<div class="card" data-modal="modal16" data-title="Bolo de Cenoura Cremoso" data-aluno="João Miguel Alves Tobias" data-responsavel="Mariane Alves Sangiorato Carvalho">
+    <img src="./imgs/bcenora.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolo de Cenoura Cremoso</h3>
+    <p><strong>Aluno:</strong> João Miguel Alves Tobias</p>
+    <p><strong>Responsável:</strong> Mariane Alves Sangiorato Carvalho</p>
+    <p><strong>Lembrança:</strong> É uma das sobremesas que ele mais gosta</p>
+  </div>
+</div>
+<div id="modal16" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bcenora.jpg" alt="receita">
+    <h3>Bolo de Cenoura Cremoso</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> João Miguel Alves Tobias</p>
+      <p><strong>Responsável:</strong> Mariane Alves Sangiorato Carvalho</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Massa</span>
+      <ul>
+        <li>1/2 xícara (chá) de óleo</li>
+        <li>3 cenouras médias raladas</li>
+        <li>4 ovos</li>
+        <li>2 xícaras (chá) de açúcar</li>
+        <li>2 e 1/2 xícaras (chá) de farinha de trigo</li>
+        <li>1 colher (sopa) de fermento em pó</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Calda</span>
+      <ul>
+        <li>1 colher (sopa) de manteiga</li>
+        <li>3 colheres (sopa) de chocolate em pó</li>
+        <li>1 xícara (chá) de açúcar</li>
+        <li>1 xícara (chá) de leite</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo - Massa</span>
+      <ul>
+        <li>Em um liquidificador, adicione a cenoura, os ovos e o óleo, depois misture</li>
+        <li>Acrescente o açúcar e bata novamente por 5 minutos</li>
+        <li>Em uma tigela ou na batedeira, adicione a farinha de trigo e depois misture novamente</li>
+        <li>Acrescente o fermento e misture lentamente com uma colher</li>
+        <li>Asse em um forno preaquecido a 180° C por aproximadamente 40 minutos</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo - Cobertura</span>
+      <ul>
+        <li>Despeje em uma tigela a manteiga, o chocolate em pó, o açúcar e o leite, depois misture</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>É uma das sobremesas que ele mais gosta</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 17 - Strogonoff de frango -->
+<div class="card" data-modal="modal17" data-title="Strogonoff de frango" data-aluno="Lucas Henrique Correa de Oliveira" data-responsavel="Gisele Rodrigues Correa">
+    <img src="./imgs/strogonoff.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Strogonoff de frango</h3>
+    <p><strong>Aluno:</strong> Lucas Henrique Correa de Oliveira</p>
+    <p><strong>Responsável:</strong> Gisele Rodrigues Correa</p>
+    <p><strong>Lembrança:</strong> Essa receita fazíamos com toda a família reunida</p>
+  </div>
+</div>
+<div id="modal17" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/strogonoff.jpg" alt="receita">
+    <h3>Strogonoff de frango</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Lucas Henrique Correa de Oliveira</p>
+      <p><strong>Responsável:</strong> Gisele Rodrigues Correa</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>Frango em cubos</li>
+        <li>Tempero a gosto</li>
+        <li>Creme leite</li>
+        <li>Molho de tomate</li>
+        <li>Catchup a gosto</li>
+        <li>Pimenta do reino</li>
+        <li>Sal a gosto</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Refogar o frango até dourar depois o molho de tomate e os tempos</li>
+        <li>Adicionar um pouco de catchup</li>
+        <li>Por último o creme de leite</li>
+        <li>Deixe engrossar um pouco e sirva com batata frita</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Essa receita fazíamos com toda a família reunida</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 18 - Pudim de Leite Condensado -->
+<div class="card" data-modal="modal18" data-title="Pudim de Leite Condensado" data-aluno="Arthur Carlos Alves Tobias" data-responsavel="Mariane Alves Sangiorato Carvalho">
+    <img src="./imgs/pudim.png" alt="receita">
+  <div class="card-content">
+    <h3>Pudim de Leite Condensado</h3>
+    <p><strong>Aluno:</strong> Arthur Carlos Alves Tobias</p>
+    <p><strong>Responsável:</strong> Mariane Alves Sangiorato Carvalho</p>
+    <p><strong>Lembrança:</strong> O Artur adora leite condensado, se deixar come direto da caixinha</p>
+  </div>
+</div>
+<div id="modal18" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/pudim.png" alt="receita">
+    <h3>Pudim de Leite Condensado</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Arthur Carlos Alves Tobias</p>
+      <p><strong>Responsável:</strong> Mariane Alves Sangiorato Carvalho</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Pudim</span>
+      <ul>
+        <li>1 lata de leite condensado</li>
+        <li>1 lata de leite (medida da lata de leite condensado)</li>
+        <li>3 ovos inteiros</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes - Calda</span>
+      <ul>
+        <li>1 xícara (chá) de açúcar</li>
+        <li>1/2 xícara de água</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo - Pudim</span>
+      <ul>
+        <li>Primeiro, bata bem os ovos no liquidificador</li>
+        <li>Acrescente o leite condensado e o leite, e bata novamente</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo - Calda</span>
+      <ul>
+        <li>Derreta o açúcar na panela até ficar moreno, acrescente a água e deixe engrossar</li>
+        <li>Coloque em uma forma redonda e despeje a massa do pudim por cima</li>
+        <li>Asse em forno médio por 45 minutos, com a assadeira redonda dentro de uma maior com água</li>
+        <li>Espete um garfo para ver se está bem assado</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>O Artur adora leite condensado, se deixar come direto da caixinha</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 19 - Bolinho de chuva da Vovó -->
+<div class="card" data-modal="modal19" data-title="Bolinho de chuva da Vovó" data-aluno="RAFAEL DA COSTA LOPES" data-responsavel="ISABEL CRISTINA DA COSTA">
+    <img src="./imgs/chuva2.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolinho de chuva da Vovó</h3>
+    <p><strong>Aluno:</strong> RAFAEL DA COSTA LOPES</p>
+    <p><strong>Responsável:</strong> ISABEL CRISTINA DA COSTA</p>
+    <p><strong>Lembrança:</strong> Bolinho que a vovó Célia faz.</p>
+  </div>
+</div>
+<div id="modal19" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/chuva2.jpg" alt="receita">
+    <h3>Bolinho de chuva da Vovó</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> RAFAEL DA COSTA LOPES</p>
+      <p><strong>Responsável:</strong> ISABEL CRISTINA DA COSTA</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>2 copos de leite</li>
+        <li>2 ovos</li>
+        <li>3 xícaras de farinha de trigo</li>
+        <li>6 gotas de baunilha</li>
+        <li>Uma colher de pó Royal rasa</li>
+        <li>Se a farinha for pouca acrescente mais um pouquinho</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Misturar os ingredientes pra dar liga</li>
+        <li>Com duas colheres vai pingando no óleo não muito quente</li>
+        <li>Depois é só polvilhar açúcar e canela</li>
+        <li>E saborear!</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Bolinho que a vovó Célia faz.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Receita 20 - Bolo de cenoura -->
+<div class="card" data-modal="modal20" data-title="Bolo de cenoura" data-aluno="Gustavo" data-responsavel="Juliana">
+    <img src="./imgs/bcenora2.jpg" alt="receita">
+  <div class="card-content">
+    <h3>Bolo de cenoura</h3>
+    <p><strong>Aluno:</strong> Gustavo</p>
+    <p><strong>Responsável:</strong> Juliana</p>
+    <p><strong>Lembrança:</strong> Sim lembrança da minha avó.</p>
+  </div>
+</div>
+<div id="modal20" class="modal">
+  <div class="modal-content">
+    <a href="#" class="modal-close" aria-label="Fechar modal">×</a>
+    <img src="./imgs/bcenora2.jpg" alt="receita">
+    <h3>Bolo de cenoura</h3>
+    <div class="modal-section">
+      <span class="modal-section-title">Informações</span>
+      <p><strong>Aluno:</strong> Gustavo</p>
+      <p><strong>Responsável:</strong> Juliana</p>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Ingredientes</span>
+      <ul>
+        <li>4 cenoura</li>
+        <li>3 ovos</li>
+        <li>Meia xícara de óleo</li>
+        <li>2 xícaras de açúcar</li>
+        <li>2 xícaras de farinha de trigo</li>
+        <li>1 colher de fermento em pó</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Modo de Preparo</span>
+      <ul>
+        <li>Bater no liquidificador os ovos, as cenouras e o óleo</li>
+        <li>Coloque em uma vasilha e acrescente o açúcar, a farinha e misture muito bem</li>
+        <li>Por último o fermento em pó e leve para assar</li>
+        <li>Se preferir pode fazer um brigadeiro mole e cobrir o bolo depois de assado</li>
+      </ul>
+    </div>
+    <div class="modal-section">
+      <span class="modal-section-title">Lembrança</span>
+      <p>Sim lembrança da minha avó.</p>
+    </div>
+  </div>
+</div>
+
+      
+    </div>
+  </div>
+
+  <script>
+    // Efeito de busca
+    const searchBox = document.getElementById('searchBox');
+    const cards = document.querySelectorAll('.card');
+
+    searchBox.addEventListener('input', () => {
+      const value = searchBox.value.toLowerCase();
+      cards.forEach(card => {
+        const title = card.dataset.title.toLowerCase();
+        const aluno = card.dataset.aluno.toLowerCase();
+        const responsavel = card.dataset.responsavel.toLowerCase();
+        card.classList.toggle('hidden', !(title.includes(value) || aluno.includes(value) || responsavel.includes(value)));
+      });
+    });
+
+    // Efeito de carregamento
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.querySelector('.splash').style.opacity = 1;
+      }, 100);
+    });
+
+    // Modal toggle
+    const modals = document.querySelectorAll('.modal');
+    const modalCloseButtons = document.querySelectorAll('.modal-close');
+    
+    // Abrir modal ao clicar no card
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const modalId = card.dataset.modal;
+        const modal = document.getElementById(modalId);
+        
+        // Fechar qualquer modal aberto
+        modals.forEach(m => m.classList.remove('active'));
+        
+        // Abrir o modal selecionado
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // Fechar modal ao clicar no X
+    modalCloseButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const modal = button.closest('.modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+    
+    // Fechar modal ao clicar fora do conteúdo
+    modals.forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        modals.forEach(modal => {
+          if (modal.classList.contains('active')) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
